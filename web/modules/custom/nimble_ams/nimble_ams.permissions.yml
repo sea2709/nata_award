@@ -1,0 +1,6 @@
+access community hub logout:
+  title: 'Access Community Hub Logout'
+access admin login page:
+  title: 'Access Admin Login Page'
+access sso login page:
+  title: 'Access SSO Login Page'

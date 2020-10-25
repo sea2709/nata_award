@@ -1,0 +1,5 @@
+services:
+  nimble_ams.route_subscriber:
+    class: Drupal\nimble_ams\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

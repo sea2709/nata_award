@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - nata_nimble
+  config:
+    - field.storage.user.field_name_first_last
+  module:
+    - user
+id: user.user.field_name_first_last
+field_name: field_name_first_last
+entity_type: user
+bundle: user
+label: 'Name (First + Last)'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

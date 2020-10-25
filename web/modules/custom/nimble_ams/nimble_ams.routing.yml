@@ -1,0 +1,25 @@
+nimble_ams.admin_login:
+  path: '/admin/login'
+  defaults:
+    _controller: '\Drupal\nimble_ams\Controller\AdminLoginController::contentCallback'
+    _title: 'Admin Login'
+  requirements:
+    _permission: 'access admin login page'
+
+nimble_ams.community_hub_logout:
+  path: '/community-hub-logout'
+  defaults:
+    _controller: '\Drupal\nimble_ams\Controller\CommunityHubLogoutController::contentCallback'
+    _title: 'Community Hub Logout'
+  requirements:
+    _permission: 'access community hub logout'
+
+nimble_ams.sso_login:
+  path: '/sso-login'
+  defaults:
+    _controller: '\Drupal\nimble_ams\Controller\SsoLoginController::contentCallback'
+    _title: 'Login'
+  requirements:
+    _permission: 'access sso login page'
+  options:
+    no_cache: 'TRUE'

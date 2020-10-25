@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - nimble_ams
+  module:
+    - nimble_ams
+id: nimble_ams_account_query_test_action
+label: 'Nimble Account Query Test'
+type: user
+plugin: "nimble_ams_account_query_test_action"
+configuration: {  }

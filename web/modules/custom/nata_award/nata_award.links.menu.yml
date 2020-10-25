@@ -1,0 +1,33 @@
+nata_award.admin:
+  title: NATA Award
+  parent: system.admin
+  description: 'NATA Award.'
+  route_name: nata_award.settings
+
+entity.nata_year.collection:
+  title: 'Years'
+  description: 'NATA Award Years'
+  route_name: entity.nata_year.collection
+  parent: nata_award.admin
+
+entity.nata_award.collection:
+  title: 'Awards'
+  route_name: entity.nata_award.collection
+  parent: nata_award.admin
+
+entity.nata_award.settings:
+  title: 'Award Settings'
+  description: 'Award Settings'
+  route_name: nata_award.award_settings
+  parent: entity.nata_award.collection
+
+entity.nata_candidate.collection:
+  title: 'Candidates'
+  route_name: entity.nata_candidate.collection
+  parent: nata_award.admin
+
+entity.nata_candidate.settings:
+  title: 'Candiate Settings'
+  description: 'Candidate Settings'
+  route_name: nata_award.candidate_settings
+  parent: entity.nata_candidate.collection

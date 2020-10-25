@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - nata_nimble
+id: certified_professional
+label: Certified Professional
+weight: -5
+is_admin: false
+permissions: {  }

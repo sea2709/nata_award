@@ -1,0 +1,47 @@
+enabled: false
+settings:
+  client_id:
+  client_secret:
+  endpoint:
+  authorization_endpoint: 'https://example.com/oauth2/authorize'
+  token_endpoint: 'https://example.com/oauth2/token'
+  userinfo_endpoint: 'https://example.com/oauth2/UserInfo'
+  sso_login_auth_user_redirect_path: ''
+  sso_login_auth_non_member_user_redirect_path: ''
+  auth_non_member_user_redirect_path: ''
+  auth_user_redirect_path: ''
+  instance: 'staging'
+  account_query_enable: false
+  account_query_append_url: 'services/apexrest/NUINT/NUIntegrationService'
+  account_query_name: 'CMSQuery'
+  account_query_key: ''
+  sso_login_redirect_whitelist: ''
+  roles_automatic_roles: ''
+  roles_member_role: ''
+  roles_non_member_role: ''
+  roles_membership_types:
+  roles_allowed_user_form: ''
+  member_number_field_name: ''
+  membership_type_field_name: ''
+  membership_type_id_field_name: ''
+  is_member_field_name: ''
+  is_staff_field_name: ''
+  is_student_field_name: ''
+  membership_join_date_field_name: ''
+  membership_start_date_field_name: ''
+  membership_end_date_field_name: ''
+  membership_end_date_override_field_name: ''
+  district_field_name: ''
+  gender_field_name: ''
+  age_field_name: ''
+  job_setting_field_name: ''
+  full_name_field_name: ''
+  name_field_name: ''
+  title_field_name: ''
+  first_name_field_name: ''
+  last_name_field_name: ''
+  account_id_field_name: ''
+  company_account_id_field_name: ''
+  company_name_field_name: ''
+  extra_email_field_name: ''
+  enable_logging: false

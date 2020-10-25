@@ -1,0 +1,5 @@
+views_custom_rewrite.library:
+  version: 1.x
+  js:
+    js/custom-rewrite.js: {}
+

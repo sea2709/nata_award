@@ -1,0 +1,10 @@
+name: NATA Award
+description: NATA Award
+core_version_requirement: ^8.8 || ^9
+package: NATA
+type: module
+dependencies:
+  - entity_print:entity_print
+  - webform:webform
+  - masquerade:masquerade
+

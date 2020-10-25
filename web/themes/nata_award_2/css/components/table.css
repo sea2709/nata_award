@@ -1,0 +1,35 @@
+table tr th {
+  background: none;
+  color: #3b3b3b;
+}
+
+tr {
+  background: none;
+}
+
+tr td {
+  background: #FFF;
+  border: none;
+}
+
+tr.odd td {
+  background: #EEE;
+}
+
+table tr td, table tr th {
+  padding: 15px;
+}
+
+thead > tr {
+  background: #FFF;
+  border-bottom: none;
+}
+table {
+  box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+table tr {
+  border-top: 1px solid rgba(224, 224, 224, 1);
+}

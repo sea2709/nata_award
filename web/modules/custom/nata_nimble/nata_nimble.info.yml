@@ -1,0 +1,8 @@
+name: NATA Nimble
+description: Does cool Nimble stuff.
+core_version_requirement: ^8.8 || ^9
+package: NATA
+type: module
+
+dependencies:
+  - nimble_ams:nimble_ams

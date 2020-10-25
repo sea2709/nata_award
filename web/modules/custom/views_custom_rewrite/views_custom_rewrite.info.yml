@@ -1,0 +1,8 @@
+name: Views Custom Rewrite
+type: module
+description: 'Custom rewrite view output.'
+dependencies:
+  - drupal:views
+package: Views
+core: 8.x
+core_version_requirement: ^8 || ^9

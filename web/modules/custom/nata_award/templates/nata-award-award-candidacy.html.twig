@@ -1,0 +1,16 @@
+<div class="nata-award-award-candidacy">
+  <ul>
+    <li class="nominee">
+      <span class="label">{{ 'Nominee:' | t }}</span>
+      <span class="value">{{ candidate.name.value }}</span>
+    </li>
+    <li class="award">
+      <span class="label">{{ 'Award:' | t }}</span>
+      <span class="value">{{ award.name.value }}</span>
+    </li>
+    <li class="status">
+      <span class="label">{{ 'Status:' | t }}</span>
+      <span class="value status-value status-{{ candidate.status.value }}">{{ candidate.status.value }}</span>
+    </li>
+  </ul>
+</div>

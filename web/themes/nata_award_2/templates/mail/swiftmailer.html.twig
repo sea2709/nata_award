@@ -1,0 +1,78 @@
+{#
+/**
+ * @file
+ * The default template file for e-mails.
+ *
+ * Available variables:
+ * - subject: The subject.
+ * - body: The message content.
+ * - is_html: True if generating HTML output, false for plain text.
+ * - message: The $message array created and used in the mail building
+ *   procedure. Its content varies between cases, but typically contains at
+ *   least the following elements:
+ *   - id: The message identifier.
+ *   - module: The module that handles the building of the message.
+ *   - key: The key of the message.
+ *   - to: The recipient email address.
+ *   - from: The email address of the sender.
+ *   - langcode: The langcode to use to compose the e-mail.
+ *   - params: The message parameters.
+ * - base_url: The site base url including scheme, without trailing slash.
+ *
+ * This template may be overriden by module and/or mail key, using any of the
+ * following template names:
+ * - swiftmailer.html.twig: global, used by default.
+ * - swiftmailer--mymodule.html.twig: only emails sent by the module "mymodule".
+ * - swiftmailer--mymodule--test.html.twig: only emails by the module
+ *   "mymodule" with key "test".
+ *
+ * @see template_preprocess()
+ * @see template_preprocess_swiftmailer()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if is_html %}
+  <html>
+  <style type="text/css">
+    table tr td {
+      font-family: Helvetica, Arial, sans-serif, serif;
+      font-size: 14px;
+    }
+  </style>
+  <body bgcolor="#EEEEEE">
+  <div style="background-color: #EEEEEE; padding: 15px;">
+    <center>
+      <table width="800px" cellpadding="0" cellspacing="0" style="border: 1px solid #EEEEEE;width:800px;">
+        <thead>
+        <tr>
+          <td align="center" style="background-color:#FFFFFF; padding: 15px;border-bottom: 2px solid #016098;">
+            <a href="{{ base_url }}"><img src="{{ base_url }}/themes/nata_award_2/logo.png" alt="NATA" /></a>
+          </td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td style="background-color: #FFFFFF; padding: 15px;">
+            {{ body }}
+          </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+          <td align="center" style="background-color: #333333; color: #FFFFFF; padding: 15px;">
+            1620 Valwood Parkway, Suite 115 <br />
+            Carrollton, TX 75006, USA<br />
+            Office Phone: 214.637.6282<br />
+            Fax: 214.637.2206
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </center>
+  </div>
+  </body>
+  </html>
+{% else %}
+{{ body }}
+{% endif %}

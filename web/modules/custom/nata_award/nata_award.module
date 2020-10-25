@@ -1,0 +1,557 @@
+<?php
+
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Url;
+use Drupal\nata_award\Entity\Invitation;
+use Drupal\nata_award\Entity\Candidate;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\webform\Entity\WebformSubmission;
+use Drupal\nata_award\Entity\Nomination;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\Markup;
+use \Drupal\webform\Entity\Webform;
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function nata_award_entity_extra_field_info() {
+  $fields['nata_award']['nata_award']['display']['nomination_criteria'] = [
+    'label' => t('Nomination Criteria'),
+    'weight' => 5,
+  ];
+
+  $fields['nata_award']['nata_award']['display']['begin_nomination_process_btn'] = [
+    'label' => t('Begin Nomination Process Button'),
+    'weight' => 6,
+  ];
+
+  $fields['nata_candidate']['nata_candidate']['display']['award_candidacy'] = [
+    'label' => t('Award Candidacy'),
+    'weight' => 5,
+  ];
+
+  $fields['nata_candidate']['nata_candidate']['display']['candidate_forms'] = [
+    'label' => t('Candidate Forms'),
+    'weight' => 6,
+  ];
+
+  $fields['nata_candidate']['nata_candidate']['display']['candidate_submissions'] = [
+    'label' => t('Candidate Submissions'),
+    'weight' => 7,
+  ];
+
+  $fields['nata_candidate']['nata_candidate']['display']['candidate_advocacy'] = [
+    'label' => t('Candidate Advocacy'),
+    'weight' => 8,
+  ];
+
+  return $fields;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for user entities.
+ */
+function nata_award_nata_award_view(array &$build, ContentEntityInterface $entity, EntityViewDisplayInterface $display) {
+  if ($display->getComponent('nomination_criteria')) {
+    if (!empty($entity->years_of_membership->value) || !empty($entity->years_of_certification->value)) {
+      $str = '';
+
+      if ($entity->years_of_membership->value === $entity->years_of_certification->value) {
+        $str = t('%years years of membership and certification.', ['%years' => $entity->years_of_membership->value]);
+      } else {
+        $arr = [];
+        if ($entity->years_of_membership->value > 0) {
+          $arr[] = t('%years years of membership', ['%years' => $entity->years_of_membership->value]);
+        }
+        if ($entity->years_of_certification->value > 0) {
+          $arr[] = t('%years years of certification', ['%years' => $entity->years_of_certification->value]);
+        }
+        if (!empty($arr)) {
+          $str = implode(' and ', $arr);
+          $str = $str . '.';
+        }
+      }
+
+      $build['nomination_criteria'] = [
+        '#type' => 'item',
+        '#markup' => $str,
+        '#name' => 'nomimation-criteria'
+      ];
+    }
+  }
+
+  if ($display->getComponent('begin_nomination_process_btn')) {
+    $activeYear = Drupal::entityTypeManager()->getStorage('nata_year')->loadByProperties(['active' => 1]);
+    if (!empty($activeYear)) {
+      $activeYear = current($activeYear);
+      $build['begin_nomination_process_btn'] = [
+        '#type' => 'link',
+        '#url' => Url::fromRoute('nata_award.begin_nomination_process',
+          ['year' => $activeYear->id(), 'award' => $entity->id()]),
+        '#title' => t('Begin Nomination Process'),
+        '#attributes' => ['class' => 'button'],
+      ];
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for user entities.
+ */
+function nata_award_nata_candidate_view(array &$build, ContentEntityInterface $entity, EntityViewDisplayInterface $display) {
+  $nataAwardCfg = \Drupal::config('nata_award.settings');
+
+  $award = current($entity->award->referencedEntities());
+  $year = current($entity->year->referencedEntities());
+
+  $storage = \Drupal::entityTypeManager()->getStorage('webform_submission');
+
+  $webformSubmissions = $storage->loadByProperties([
+    'entity_type' => 'user',
+    'entity_id' => $entity->user->target_id,
+  ]) + $storage->loadByProperties([
+    'entity_type' => $entity->getEntityTypeId(),
+    'entity_id' => $entity->id(),
+  ]);
+
+  if ($display->getComponent('award_candidacy')) {
+    $build['award_candidacy'] = [
+      '#theme' => 'nata_award_award_candidacy',
+      '#candidate' => $entity,
+      '#award' => $award
+    ];
+  }
+
+  if ($display->getComponent('candidate_forms')) {
+    $submittedWebformIds = [];
+    foreach ($webformSubmissions as $s) {
+      $submittedWebformIds[] = $s->webform_id->target_id;
+    }
+
+    $forms = $year->forms->referencedEntities();
+    $openEndedForm = current($award->open_ended_form->referencedEntities());
+    if (!empty($openEndedForm)) {
+      $forms[] = $openEndedForm;
+    }
+    $forms[] = Webform::load($nataAwardCfg->get('about_me_form'));
+
+    $activeForm = \Drupal::routeMatch()->getParameter('form');
+    if (empty($activeForm)) {
+      $activeForm = current($forms);
+    }
+    if (\Drupal::currentUser()->id() == $entity->user->target_id) {
+      if ($openEndedForm && $activeForm->id() == $openEndedForm->id()) {
+        $activeFormRenderArr = $activeForm->getSubmissionForm(['entity_type' => $entity->getEntityTypeId(), 'entity_id' => $entity->id()]);
+      } else {
+        $activeFormRenderArr = $activeForm->getSubmissionForm(['entity_type' => 'user', 'entity_id' => $entity->user->target_id]);
+      }
+    } else {
+      $storage = \Drupal::entityTypeManager()->getStorage('webform_submission');
+      if ($openEndedForm && $activeForm->id() == $openEndedForm->id()) {
+        $webformSubmissions = $storage->loadByProperties([
+          'entity_type' => $entity->getEntityTypeId(),
+          'entity_id' => $entity->id(),
+          'webform_id' => $activeForm->id()
+        ]);
+      } else {
+        $webformSubmissions = $storage->loadByProperties([
+          'entity_type' => 'user',
+          'entity_id' => $entity->user->target_id,
+          'webform_id' => $activeForm->id()
+        ]);
+      }
+      if (!empty($webformSubmissions)) {
+        $sub = current($webformSubmissions);
+        $webformSubmissionViewBuilder = \Drupal::entityTypeManager()->getViewBuilder('webform_submission');
+        $activeFormRenderArr = $webformSubmissionViewBuilder->view($sub);
+        $activeFormRenderArr['#cache'] = ['max-age' => 0];
+      } else {
+        $activeFormRenderArr = [
+          '#type' => 'markup',
+          '#markup' => '<div class="webform-submission-data">'
+            . t('The candidate has not filled out this form yet!') . '</div>',
+          '#cache' => ['max-age' => 0]
+        ];
+      }
+    }
+    unset($activeFormRenderArr['information']);
+    $build['candidate_forms']['forms'] = [
+      '#theme' => 'nata_award_candidate_forms',
+      '#candidate' => $entity,
+      '#forms' => $forms,
+      '#activeForm' => $activeForm,
+      '#submittedWebformIds' => $submittedWebformIds,
+      '#activeFormRenderArr' => $activeFormRenderArr,
+      '#cache' => ['max-age' => 0]
+    ];
+
+    if ($entity->status->value == Candidate::ACCEPTED) {
+      $invitations = \Drupal::entityTypeManager()->getStorage('nata_invitation')->loadByProperties([
+        'candidate' => $entity->id()
+      ]);
+
+      $nSubmittedInvitaions = 0;
+      if (count($invitations) > 0) {
+        foreach ($invitations as $i) {
+          if ($i->status->value == Invitation::SUBMITTED) {
+            $nSubmittedInvitaions++;
+          }
+        }
+      }
+
+      if ($nSubmittedInvitaions >= $award->n_required_advocate_form->value && $entity->access('update')) {
+        $build['candidate_forms']['submit'] = _show_submit_profile_btn($entity);
+      }
+    }
+  }
+
+  if ($display->getComponent('candidate_submissions')) {
+    $renderOfSubmissions = [];
+    $viewBuilder = \Drupal::entityTypeManager()->getViewBuilder('webform_submission');
+    foreach ($webformSubmissions as $key => $s) {
+      if ($nataAwardCfg->get('about_me_form') != $s->webform_id->target_id) {
+        $renderOfSubmissions['submission_' . $key] = $viewBuilder->view($s);
+      }
+    }
+    $build['candidate_submissions'] = $renderOfSubmissions;
+  }
+
+  if ($display->getComponent('candidate_advocacy')) {
+    $advocateForms = $award->advocate_form->referencedEntities();
+    if (!empty($advocateForms)) {
+      $build['candidate_advocacy'] = [];
+      $build['candidate_advocacy']['help_text'] = [
+        '#type' => 'markup',
+        '#markup' => $award->advocacy_help_text->value
+      ];
+
+      $header = ['', t('Relationship'), t('Advocate'), t('Email'), t('Status')];
+      $rows = [];
+      $invitations = \Drupal::entityTypeManager()->getStorage('nata_invitation')->loadByProperties([
+        'candidate' => $entity->id()
+      ]);
+
+      $currentUser = \Drupal::currentUser();
+      foreach ($invitations as $i) {
+        $link = '';
+        if ($currentUser && $i->status->value == Invitation::INVITED && $currentUser->id() == $i->user->target_id) {
+          $deleteUrl = Url::fromRoute('nata_award.nata_invitation.delete',
+            ['invitation' => $i->id(), 'destination' => \Drupal::request()->getRequestUri()])->toString();
+          $resendUrl = Url::fromRoute('nata_award.nata_invitation.resend',
+            ['invitation' => $i->id(), 'destination' => \Drupal::request()->getRequestUri()])->toString();
+          $link = '<a href="' . $deleteUrl . '">' . t('Delete') . '</a>&nbsp;/&nbsp;'
+            . '<a href="' . $resendUrl . '">' . t('Resend') . '</a>';
+        }
+        $rows[] = [
+          ['data' => ['#markup' => $link]],
+          isset(Invitation::RELATIONSHIP_OPTIONS[$i->relationship->value]) ?
+            t(Invitation::RELATIONSHIP_OPTIONS[$i->relationship->value]) : $i->relationship->value,
+          $i->name->value,
+          $i->email->value,
+          ['data' => ['#markup' => '<span class="status-value status-' . $i->status->value . '">' . $i->status->value . '</span>']],
+        ];
+      }
+
+      if (count($rows) > 0) {
+        $build['candidate_advocacy']['invitation-list'] = [
+          '#theme' => 'table',
+          '#header' => $header,
+          '#rows' => $rows,
+          '#cache' => ['max-age' => 0],
+          '#attributes' => [
+            'class' => ['invitation-list']
+          ]
+        ];
+      }
+
+      $build['candidate_advocacy']['invite_actions'] = [
+        '#type' => 'actions',
+        '#attributes' => ['class' => 'invite-actions-wrapper']
+      ];
+
+      $build['candidate_advocacy']['invite_actions']['invite_btn'] = [
+        '#type' => 'link',
+        '#title' => t('Invite Advocate'),
+        '#url' => Url::fromRoute('nata_award.candidate.invite_advocate', ['candidate' => $entity->id()]),
+        '#attributes' => ['class' => 'button'],
+      ];
+
+      if ($entity->status->value == Candidate::ACCEPTED) {
+        $nSubmittedInvitaions = 0;
+        if (count($invitations) > 0) {
+          foreach ($invitations as $i) {
+            if ($i->status->value == Invitation::SUBMITTED) {
+              $nSubmittedInvitaions++;
+            }
+          }
+        }
+
+        if ($nSubmittedInvitaions >= $award->n_required_advocate_form->value && $entity->access('update')) {
+          $build['candidate_advocacy'][] = _show_submit_profile_btn($entity);
+        }
+      }
+    }
+  }
+}
+
+function _show_submit_profile_btn($candidate) {
+  $build['submit_actions'] = [
+    '#type' => 'actions',
+    '#attributes' => ['class' => 'submit-btn-wrapper']
+  ];
+  $build['submit_actions']['submit_btn'] = [
+    '#type' => 'link',
+    '#title' => t('Submit My Profile'),
+    '#url' => Url::fromRoute('nata_award.candidate_update_status', [
+      'candidate' => $candidate->id(),
+      'status' => Candidate::SUBMITTED,
+      'destination' => \Drupal::request()->getRequestUri()
+    ]),
+    '#attributes' => ['class' => 'button'],
+  ];
+
+  return $build;
+}
+
+function nata_award_user_login(EntityInterface $user) {
+  if (!empty($user->field_nimble_account_id->value)) {
+    $entityStorage = \Drupal::entityTypeManager()->getStorage('nata_candidate');
+    $query = $entityStorage->getQuery();
+    $query->condition('nimble_account_id', $user->field_nimble_account_id->value);
+    $query->notExists('user');
+    $nids = $query->execute();
+    if (!empty($nids)) {
+      $candidate = $entityStorage->load(current($nids));
+      if (!empty($candidate)) {
+        $candidate->user = $user;
+        $candidate->save();
+      }
+    }
+  }
+}
+
+function nata_award_theme() {
+  $theme = [];
+
+  $theme['nata_award_award_candidacy'] = [
+    'variables' => [
+      'candidate' => NULL,
+      'award' => NULL
+    ],
+  ];
+
+  $theme['nata_award_candidate_forms'] = [
+    'variables' => [
+      'candidate' => NULL,
+      'forms' => NULL,
+      'activeForm' => NULL,
+      'activeFormRenderArr' => NULL,
+      'submittedWebformIds' => []
+    ],
+  ];
+
+  $theme['nata_award_candidate_advocate_invitation'] = [
+    'variables' => [
+      'candidate' => NULL,
+      'invitation' => NULL,
+      'award' => NULL
+    ],
+  ];
+
+  return $theme;
+}
+
+function nata_award_nata_invitation_presave(Invitation $invitation) {
+  if (empty($invitation->token->value)) {
+    $random = new \Drupal\Component\Utility\Random();
+    $token = $random->name(32);
+    $invitation->token->value = $token;
+  }
+}
+
+function nata_award_nata_invitation_insert(Invitation $invitation) {
+  $invitation->sendEmailInvitation();
+}
+
+function nata_award_nata_invitation_delete(EntityInterface $invitation) {
+  $submissionStorageHandler = \Drupal::entityTypeManager()->getStorage('webform_submission');
+  $submissions = $submissionStorageHandler->loadByProperties([
+    'entity_type' => $invitation->getEntityTypeId(),
+    'entity_id' => $invitation->id(),
+  ]);
+  $submissionStorageHandler->delete($submissions);
+}
+
+function nata_award_webform_submission_insert(WebformSubmission $submission) {
+  $sourceEntity = $submission->getSourceEntity();
+  if ($sourceEntity->getEntityTypeId() == 'nata_invitation') {
+    $sourceEntity->status = Invitation::SUBMITTED;
+    $sourceEntity->save();
+  }
+}
+
+function nata_award_nata_nomination_insert(Nomination $nomination) {
+  $tokenService = \Drupal::token();
+  $mailManager = \Drupal::service('plugin.manager.mail');
+  $nataAwardCfg = \Drupal::config('nata_award.settings');
+
+  $candidate = current($nomination->candidate->referencedEntities());
+
+  if ($candidate->status->value == Candidate::NOMINATED) {
+    $module = 'nata_award';
+    $key = 'nomination_submitted';
+    $to = $candidate->email->value;
+    $params['subject'] = $nataAwardCfg->get('nomination_settings_email_subject');
+    $params['body'] = Markup::create(
+      $tokenService->replace($nataAwardCfg->get('nomination_settings_email_body'), ['nata_nomination' => $nomination]));
+    $langcode = \Drupal::currentUser()->getPreferredLangcode();
+    $send = true;
+
+    $result = $mailManager->mail($module, $key, $to, $langcode, $params, NULL, $send);
+    $messenger = \Drupal::messenger();
+    if ($result['result'] !== true) {
+      \Drupal::logger('nata_award')->error('Could not send email to candidate', ['nata_nomination' => $nomination]);
+    } else {
+      $messenger->addMessage(t('An email has been sent successfully to the candidate.'));
+    }
+  }
+}
+
+function nata_award_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'request_candidate_advocate_form':
+    case 'candidate_submitted':
+    case 'candidate_accepted':
+    case 'nomination_submitted':
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = $params['subject'];
+      $message['body'][] = $params['body'];
+      if (!empty($params['attachments'])) {
+        $message['params']['files'] = $params['attachments'];
+      }
+
+      $nataAwardCfg = \Drupal::config('nata_award.settings');
+      $message['headers']['Bcc'] = $nataAwardCfg->get('general_bcc_email');
+
+      break;
+  }
+}
+
+function nata_award_token_info() {
+  $info = [];
+
+  $info['tokens']['nata_invitation']['invite_url'] = [
+    'name' => t("Invite URL"),
+    'description' => t("The unique URL of invitation.")
+  ];
+
+  $info['tokens']['nata_nomination']['accept_url'] = [
+    'name' => t("Accept URL"),
+    'description' => t("The URL for accepting the nomination.")
+  ];
+
+  $info['tokens']['nata_nomination']['decline_url'] = [
+    'name' => t("Decline URL"),
+    'description' => t("The URL for declining the nomination.")
+  ];
+
+  return $info;
+}
+
+function nata_award_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = array();
+
+  if ($type == 'nata_invitation') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'invite_url':
+          $url = Url::fromRoute('nata_award.candidate.fill_out_advocate_form',
+            [
+              'candidate' => $data['nata_invitation']->candidate->target_id,
+              'invitation' => $data['nata_invitation']->id(),
+              'email' => $data['nata_invitation']->email->value,
+              'token' => $data['nata_invitation']->token->value,
+            ],
+            ['absolute' => TRUE]);
+          $replacements[$original] = $url->toString();
+
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  if ($type == 'nata_nomination') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'decline_url':
+          $url = Url::fromRoute('nata_award.candidate_update_status',
+            ['candidate' => $data['nata_nomination']->candidate->target_id, 'status' => Candidate::DECLINED],
+            ['absolute' => TRUE]);
+          $replacements[$original] = $url->toString();
+          break;
+        case 'accept_url':
+          $url = Url::fromRoute('nata_award.candidate_update_status',
+            ['candidate' => $data['nata_nomination']->candidate->target_id, 'status' => Candidate::ACCEPTED],
+            ['absolute' => TRUE]);
+          $replacements[$original] = $url->toString();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+function nata_award_entity_view_mode_alter(&$view_mode, $entity) {
+  if ($entity->getEntityTypeId() == 'nata_candidate') {
+    if ($entity->access('view') && !$entity->access('update')) {
+      $view_mode = 'sponsor';
+    }
+  }
+}
+
+function nata_award_page_attachments(array &$page) {
+  $page['#attached']['library'][] = 'nata_award/drupal.nata_award.toolbar';
+}
+
+function nata_award_nata_candidate_delete(EntityInterface $candidate) {
+  $invitationStorageHandler = \Drupal::entityTypeManager()->getStorage('nata_invitation');
+  $invitations = $invitationStorageHandler->loadByProperties([
+    'candidate'=> $candidate->id()
+  ]);
+  $invitationStorageHandler->delete($invitations);
+
+  $nominationStorageHandler = \Drupal::entityTypeManager()->getStorage('nata_nomination');
+  $nominations = $nominationStorageHandler->loadByProperties([
+    'candidate' => $candidate->id(),
+  ]);
+  $nominationStorageHandler->delete($nominations);
+
+  $submissionStorageHandler = \Drupal::entityTypeManager()->getStorage('webform_submission');
+  $submissions = $submissionStorageHandler->loadByProperties([
+    'entity_type' => $candidate->getEntityTypeId(),
+    'entity_id' => $candidate->id(),
+  ]);
+  $submissionStorageHandler->delete($submissions);
+
+  $year = current($candidate->year->referencedEntities());
+  if (!empty($year) && !empty($candidate->user->target_id)) {
+    $subs = [];
+    $forms = $year->forms->referencedEntities();
+    foreach ($forms as $form) {
+      $subs += $submissionStorageHandler->loadByProperties([
+        'entity_type' => 'user',
+        'entity_id' => $candidate->user->target_id,
+        'webform_id' => $form->id()
+      ]);
+    }
+    if (!empty($subs)) {
+      $submissionStorageHandler->delete($subs);
+    }
+  }
+}

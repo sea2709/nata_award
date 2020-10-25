@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - nata_nimble
+  config:
+    - field.storage.user.field_member_number
+  module:
+    - user
+id: user.user.field_member_number
+field_name: field_member_number
+entity_type: user
+bundle: user
+label: 'Member Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

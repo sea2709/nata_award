@@ -1,0 +1,25 @@
+#page-wrapper {
+  position: relative;
+  padding-bottom: 115px;
+  min-height: calc(100vh - 115px);
+}
+
+.layout-main {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.site-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.layout-main-wrapper {
+  min-height: auto;
+}
+
+.region-content {
+  margin-bottom: 15px;
+}

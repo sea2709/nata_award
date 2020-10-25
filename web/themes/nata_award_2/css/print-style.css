@@ -1,0 +1,54 @@
+.nata-award-award-candidacy {
+  text-align: center;
+}
+
+.nata-award-award-candidacy ul {
+  list-style-type: none;
+  padding-left: 0;
+  font-size: 1.25em;
+}
+.nata-award-award-candidacy ul .value {
+  font-weight: 700;
+}
+
+.webform-submission-data .webform-element label {
+  display: block;
+  font-weight: 700;
+}
+
+.webform-submission-data .webform-container-type-details {
+  border: 1px solid #AAA;
+  margin-bottom: 15px;
+}
+
+.webform-submission-data .webform-container-type-details summary {
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #DDD;
+  padding: 5px 15px
+}
+
+.webform-submission-data .webform-container-type-details .details-wrapper {
+  padding: 15px;
+}
+
+.webform-submission-data ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+.webform-submission-data ul li {
+  padding: 15px 0;
+}
+.webform-submission-data ul li + li {
+  border-top: 1px solid #AAA;
+}
+.webform-submission-data ul li:last-child {
+  padding-bottom: 0;
+}
+.webform-submission-data .webform-element-type-textarea {
+  margin-top: 15px;
+}
+.webform-submission-data .webform-element-type-textarea:first-child {
+  margin-top: 0;
+}

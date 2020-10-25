@@ -1,0 +1,21 @@
+# Main theme library.
+global:
+  css:
+    component:
+      css/components/table.css: {}
+      css/components/buttons.css: {}
+      css/components/block.css: {}
+    theme:
+      css/theme/style.css: {}
+    layout:
+      css/layouts/layout.css: {}
+
+fontawesome:
+  css:
+    theme:
+      fontawesome/css/all.css: {}
+
+print-styling:
+  css:
+    theme:
+      css/print-style.css: {}

@@ -1,0 +1,165 @@
+# Schema for the configuration files of the OpenID Connect module.
+openid_connect.settings.nimble:
+  type: config_object
+  label: 'OpenID Connect Nimble settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enable client'
+    settings:
+      type: mapping
+      mapping:
+        client_id:
+          type: string
+          label: 'Client ID'
+        client_secret:
+          type: string
+          label: 'Client secret'
+        endpoint:
+          type: string
+          label: 'Base Community Hub Endpoint'
+        authorization_endpoint:
+          type: string
+          label: 'Authorization endpoint'
+        token_endpoint:
+          type: string
+          label: 'Token endpoint'
+        userinfo_endpoint:
+          type: string
+          label: 'Userinfo endpoint'
+        sso_login_redirect_whitelist:
+          type: sequence
+          label: 'Domains to whitelist for redirect from sso-login path, retUrl parameter'
+          sequence:
+            type: string
+            label: 'Domain'
+        auth_user_redirect_path:
+          type: string
+          label: 'Redirect for authenticated member users path'
+        auth_non_member_user_redirect_path:
+          type: string
+          label: 'Redirect for authenticated non member users path'
+        sso_login_auth_user_redirect_path:
+          type: string
+          label: 'SSO Login redirect for authenticated member users path'
+        sso_login_auth_non_member_user_redirect_path:
+          type: string
+          label: 'SSO Login redirect for authenticated non member users path'
+        instance:
+          type: string
+          label: 'Nimble Instance'
+        account_query_enable:
+          type: boolean
+          label: 'Enable Account Query'
+        account_query_append_url:
+          type: string
+          label: 'Account Query path to append to the base endpoint'
+        account_query_name:
+          type: string
+          label: 'Account Query API Name'
+        account_query_key:
+          type: string
+          label: 'Account Query Key'
+        roles_automatic_roles:
+          label: 'Automatically assigned roles'
+          type: sequence
+          sequence:
+            type: string
+            label: 'Role'
+        roles_allowed_user_form:
+          type: sequence
+          label: 'User roles access to user form'
+          sequence:
+            type: string
+            label: 'Role'
+        roles_member_role:
+          type: string
+          label: 'Member Role'
+        roles_non_member_role:
+          type: string
+          label: 'Non Member Role'
+        roles_membership_types:
+          type: sequence
+          label: 'Role Membership Types'
+          sequence:
+            type: mapping
+            label: 'Roles mapped to membership types'
+            mapping:
+              role:
+                type: string
+                label: 'Role id'
+              membership_type:
+                type: string
+                label: 'Membership Type'
+        member_number_field_name:
+          type: string
+          label: 'Member Number Field Name'
+        membership_type_field_name:
+          type: string
+          label: 'Membership Type Field Name'
+        membership_type_id_field_name:
+          type: string
+          label: 'Membership Type ID Field Name'
+        is_member_field_name:
+          type: string
+          label: 'Is Member Field Name'
+        is_staff_field_name:
+          type: string
+          label: 'Is Staff Field Name'
+        is_student_field_name:
+          type: string
+          label: 'Is Student Field Name'
+        membership_join_date_field_name:
+          type: string
+          label: 'Join Date Field Name'
+        membership_start_date_field_name:
+          type: string
+          label: 'Membership Start Date Field Name'
+        membership_end_date_field_name:
+          type: string
+          label: 'Membership End Date Field Name'
+        membership_end_date_override_field_name:
+          type: string
+          label: 'Membership End Date Override Field Name'
+        district_field_name:
+          type: string
+          label: 'District Field Name'
+        gender_field_name:
+          type: string
+          label: 'Gender Field Name'
+        age_field_name:
+          type: string
+          label: 'Age Field Name'
+        job_setting_field_name:
+          type: string
+          label: 'Job Setting Field Name'
+        title_field_name:
+          type: string
+          label: 'Title Field Name'
+        full_name_field_name:
+          type: string
+          label: 'Full Name Field Name'
+        name_field_name:
+          type: string
+          label: 'Name Field Name'
+        first_name_field_name:
+          type: string
+          label: 'First Name Field Name'
+        last_name_field_name:
+          type: string
+          label: 'Last Name Field Name'
+        account_id_field_name:
+          type: string
+          label: 'Nimble Account ID Field Name'
+        company_account_id_field_name:
+          type: string
+          label: 'Company Nimble Account ID'
+        company_name_field_name:
+          type: string
+          label: 'Company Name Field Name'
+        extra_email_field_name:
+          type: string
+          label: 'Extra Email Field Name'
+        enable_logging:
+          type: boolean
+          label: 'Enable Logging'

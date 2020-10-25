@@ -1,0 +1,114 @@
+{
+    "name": "drupal/recommended-project",
+    "description": "Project template for Drupal 9 projects with a relocated document root",
+    "type": "project",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/drupal",
+    "support": {
+        "docs": "https://www.drupal.org/docs/user_guide/en/index.html",
+        "chat": "https://www.drupal.org/node/314178"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "composer/installers": "^1.9",
+        "dompdf/dompdf": "0.8.5",
+        "drupal/admin_toolbar": "^2.3",
+        "drupal/core-composer-scaffold": "^9",
+        "drupal/core-project-message": "^9",
+        "drupal/core-recommended": "^9",
+        "drupal/ds": "^3.9",
+        "drupal/entity_print": "^2.2",
+        "drupal/entity_reference_exposed_filters": "^1.0@alpha",
+        "drupal/examples": "^3.0",
+        "drupal/field_group": "^3.1",
+        "drupal/field_permissions": "^1.1",
+        "drupal/jquery_ui_datepicker": "^1.0",
+        "drupal/jquery_ui_tabs": "^1.1",
+        "drupal/jquery_ui_tooltip": "^1.1",
+        "drupal/masquerade": "^2.0@beta",
+        "drupal/material_base": "^1.8",
+        "drupal/openid_connect": "^1.0@RC",
+        "drupal/profile": "^1.1",
+        "drupal/reroute_email": "^2.0",
+        "drupal/smtp": "^1.0@RC",
+        "drupal/swiftmailer": "^2.0@beta",
+        "drupal/token": "^1.7",
+        "drupal/token_filter": "^1.2",
+        "drupal/view_mode_page": "^4.0",
+        "drupal/views_attach_library": "^2.0",
+        "drupal/views_bootstrap": "^4.3",
+        "drupal/views_bulk_operations": "^3.9",
+        "drupal/views_data_export": "^1.0",
+        "drupal/webform": "~6.0",
+        "drush/drush": "^10.3",
+        "mikehaertl/phpwkhtmltopdf": "~2.1",
+        "tecnickcom/tcpdf": "~6"
+    },
+    "conflict": {
+        "drupal/drupal": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web/"
+            }
+        },
+        "installer-paths": {
+            "web/core": [
+                "type:drupal-core"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library"
+            ],
+            "web/modules/contrib/{$name}": [
+                "type:drupal-module"
+            ],
+            "web/profiles/contrib/{$name}": [
+                "type:drupal-profile"
+            ],
+            "web/themes/contrib/{$name}": [
+                "type:drupal-theme"
+            ],
+            "drush/Commands/contrib/{$name}": [
+                "type:drupal-drush"
+            ],
+            "web/modules/custom/{$name}": [
+                "type:drupal-custom-module"
+            ],
+            "web/themes/custom/{$name}": [
+                "type:drupal-custom-theme"
+            ]
+        },
+        "drupal-core-project-message": {
+            "include-keys": [
+                "homepage",
+                "support"
+            ],
+            "post-create-project-cmd-message": [
+                "<bg=blue;fg=white>                                                         </>",
+                "<bg=blue;fg=white>  Congratulations, you’ve installed the Drupal codebase  </>",
+                "<bg=blue;fg=white>  from the drupal/recommended-project template!          </>",
+                "<bg=blue;fg=white>                                                         </>",
+                "",
+                "<bg=yellow;fg=black>Next steps</>:",
+                "  * Install the site: https://www.drupal.org/docs/8/install",
+                "  * Read the user guide: https://www.drupal.org/docs/user_guide/en/index.html",
+                "  * Get support: https://www.drupal.org/support",
+                "  * Get involved with the Drupal community:",
+                "      https://www.drupal.org/getting-involved",
+                "  * Remove the plugin that prints this message:",
+                "      composer remove drupal/core-project-message"
+            ]
+        }
+    }
+}

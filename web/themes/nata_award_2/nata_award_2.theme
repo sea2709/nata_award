@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Functions to support theming in the NATA Award 2 theme.
+ */
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ */
+function nata_award_2_preprocess_html(&$variables) {
+
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page.html.twig.
+ */
+function nata_award_2_preprocess_page(&$variables) {
+  $variables['url'] = \Drupal::request()->getUri();
+}
+

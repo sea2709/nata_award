@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - nata_nimble
+  config:
+    - field.storage.user.field_company_account_id
+  module:
+    - user
+id: user.user.field_company_account_id
+field_name: field_company_account_id
+entity_type: user
+bundle: user
+label: 'Company Account ID'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

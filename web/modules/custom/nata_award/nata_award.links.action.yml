@@ -1,0 +1,23 @@
+nata_year.add_year:
+  route_name: 'entity.nata_year.add_form'
+  title: 'Add year'
+  appears_on:
+    - 'entity.nata_year.collection'
+
+nata_award.add_award:
+  route_name: 'entity.nata_award.add_form'
+  title: 'Add award'
+  appears_on:
+    - 'entity.nata_award.collection'
+
+nata_candidate.add_candidate:
+  route_name: 'entity.nata_candidate.add_form'
+  title: 'Add candidate'
+  appears_on:
+    - 'entity.nata_candidate.collection'
+
+nata_invitation.add_invitation:
+  route_name: 'entity.nata_invitation.add_form'
+  title: 'Add invitation'
+  appears_on:
+    - 'entity.nata_invitation.collection'

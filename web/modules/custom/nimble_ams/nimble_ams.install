@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function nimble_ams_install() {
+  module_set_weight('nimble_ams', 101);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function nimble_ams_uninstall() {
+  \Drupal::configFactory()->getEditable('openid_connect.settings.nimble')->delete();
+}
+
+/**
+ * Adjust weight module
+ */
+function nimble_ams_update_8101() {
+  module_set_weight('nimble_ams', 101);
+}

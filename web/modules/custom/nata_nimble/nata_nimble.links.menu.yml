@@ -1,0 +1,10 @@
+nata_nimble.user_login:
+  route_name: nimble_ams.sso_login
+  title: 'Log in'
+  description: 'NATA Single Sign-on'
+  weight: -9
+nata_nimble.user_logout:
+  route_name: nimble_ams.community_hub_logout
+  title: 'Log out'
+  description: 'Log out'
+  weight: -9

@@ -1,0 +1,8 @@
+# Schema for the configuration files of the NATA Award 2 theme.
+nata_award_2.settings:
+  type: theme_settings
+  label: 'NATA Award 2 settings'
+  mapping:
+    font_size:
+      type: integer
+      label: Font size

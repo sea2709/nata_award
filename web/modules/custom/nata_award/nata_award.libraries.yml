@@ -1,0 +1,17 @@
+drupal.nata_award:
+  version: VERSION
+  dependencies:
+    - core/jquery
+    - core/drupal.dialog.ajax
+    - core/jquery.form
+
+
+drupal.nata_award.toolbar:
+  version: 1.x
+  css:
+    theme:
+      css/toolbar.css: {}
+
+drupal.nata_award.search_candidates:
+  js:
+    js/search-candidates.js: {}

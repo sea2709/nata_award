@@ -1,0 +1,179 @@
+nata_award.award_settings:
+  path: '/admin/structure/nata_award_award_settings'
+  defaults:
+    _form: '\Drupal\nata_award\Form\AwardSettingsForm'
+    _title: 'Award settings'
+  requirements:
+    _permission: 'administer nata_award'
+
+nata_award.candidate_settings:
+  path: '/admin/structure/nata_award_candidate_settings'
+  defaults:
+    _form: '\Drupal\nata_award\Form\CandidateSettingsForm'
+    _title: 'Candidate settings'
+  requirements:
+    _permission: 'administer nata_award'
+
+nata_award.begin_nomination_process:
+  path: '/award/begin-nominate/{year}/{award}'
+  defaults:
+    _form: '\Drupal\nata_award\Form\SearchCandidateForm'
+  requirements:
+    _permission: 'nominate nata_award'
+  options:
+    parameters:
+      year:
+        type: entity:nata_year
+      award:
+        type: entity:nata_award
+
+nata_award.nominate:
+  path: '/award/nominate/{year}/{award}/{candidate}'
+  defaults:
+    _form: '\Drupal\nata_award\Form\NominateCandidateForm'
+  requirements:
+    _permission: 'nominate nata_award'
+  options:
+    parameters:
+      year:
+        type: entity:nata_year
+      award:
+        type: entity:nata_award
+
+nata_award.nominate_successfully:
+  path: '/award/nominate-successfully'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\NominateController::nominateSuccessfully'
+    _title: 'Nominate Successfully'
+  requirements:
+    _permission: 'nominate nata_award'
+
+nata_award.candidate_update_status:
+  path: '/candidate/update-status/{candidate}/{status}'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\CandidateController::updateStatus'
+  requirements:
+    _entity_access: 'candidate.update'
+    _custom_access: '\Drupal\nata_award\Controller\CandidateController::updateStatusAccess'
+  options:
+    parameters:
+      candidate:
+        type: entity:nata_candidate
+
+## Route name can be used in several places; e.g. links, redirects, and local
+## actions.
+entity.nata_candidate.canonical:
+  path: '/candidate/{nata_candidate}'
+  defaults:
+    # Calls the view controller, defined in the annotation of the contact
+    # entity. This marks this route as belonging to this entity type.
+    _entity_view: 'nata_candidate'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix ('view')
+    # as the $operation parameter to checkAccess().
+    _entity_access: 'nata_candidate.view'
+
+## Route name can be used in several places; e.g. links, redirects, and local
+## actions.
+entity.nata_award.canonical:
+  path: '/nata_award/{nata_award}'
+  defaults:
+    # Calls the view controller, defined in the annotation of the contact
+    # entity. This marks this route as belonging to this entity type.
+    _entity_view: 'nata_award'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix ('view')
+    # as the $operation parameter to checkAccess().
+    _entity_access: 'nata_award.view'
+
+entity.nata_candidate.canonical_sponsor_statement:
+  path: '/candidate/sponsor_statement/{nata_candidate}'
+  defaults:
+    # Calls the view controller, defined in the annotation of the contact
+    # entity. This marks this route as belonging to this entity type.
+    _entity_view: 'nata_candidate.sponsor_statement'
+  requirements:
+    # Calls the access controller of the entity, passing in the suffix ('view')
+    # as the $operation parameter to checkAccess().
+    _entity_access: 'nata_candidate.view'
+
+nata_award.candidate.fill_out_form:
+  path: '/candidate/form/{candidate}/{form}'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\CandidateController::fillOutForm'
+  requirements:
+    _entity_access: 'candidate.update'
+  options:
+    parameters:
+      candidate:
+        type: entity:nata_candidate
+      form:
+        type: entity:webform
+
+nata_award.candidate.invite_advocate:
+  path: '/candidate/invite-advocate/{candidate}'
+  defaults:
+    _title: 'Invite Advocate'
+    _form: '\Drupal\nata_award\Form\InviteAdvocateForm'
+  requirements:
+    _entity_access: 'candidate.invite_advocate'
+  options:
+    parameters:
+      candidate:
+        type: entity:nata_candidate
+
+nata_award.candidate.fill_out_advocate_form:
+  path: '/candidate/advocate-form/{candidate}/{invitation}'
+  defaults:
+    _title: 'Advocate Form'
+    _controller: '\Drupal\nata_award\Controller\CandidateController::fillOutAdvocateForm'
+  requirements:
+    _custom_access: '\Drupal\nata_award\Controller\CandidateController::fillOutAdvocateFormAccess'
+    _entity_access: 'candidate.fill_out_advocate'
+  options:
+    parameters:
+      candidate:
+        type: entity:nata_candidate
+      invitation:
+        type: entity:nata_invitation
+
+nata_award.nata_invitation.update_status:
+  path: '/invitation/update-status/{invitation}/{status}'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\InvitationController::updateStatus'
+  requirements:
+    _custom_access: '\Drupal\nata_award\Controller\InvitationController::updateStatusAccess'
+  options:
+    parameters:
+      invitation:
+        type: entity:nata_invitation
+
+nata_award.nata_invitation.delete:
+  path: '/invitation/delete/{invitation}'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\InvitationController::delete'
+  requirements:
+    _custom_access: '\Drupal\nata_award\Controller\InvitationController::deleteAndResendAccess'
+  options:
+    parameters:
+      invitation:
+        type: entity:nata_invitation
+
+nata_award.nata_invitation.resend:
+  path: '/invitation/resend/{invitation}'
+  defaults:
+    _controller: '\Drupal\nata_award\Controller\InvitationController::resend'
+  requirements:
+    _custom_access: '\Drupal\nata_award\Controller\InvitationController::deleteAndResendAccess'
+  options:
+    parameters:
+      invitation:
+        type: entity:nata_invitation
+
+nata_award.settings:
+  path: '/admin/nata_award/settings'
+  defaults:
+    _form: '\Drupal\nata_award\Form\SettingsForm'
+    _title: 'NATA Award'
+  requirements:
+    _permission: 'administer site configuration'

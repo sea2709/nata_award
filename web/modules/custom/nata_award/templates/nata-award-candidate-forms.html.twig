@@ -1,0 +1,18 @@
+<div class="nata-award-candidate-forms">
+  <ul class="links">
+    {% for form in forms %}
+      {%
+        set cls = (activeForm and activeForm.id() == form.id()) ? 'is-active' : ''
+      %}
+      <li class="{{ cls }}">
+        <a href="{{ url('nata_award.candidate.fill_out_form', {'candidate': candidate.id(), 'form': form.id()}) }}">
+          {{ form.label() }}
+          {% if not (form.id() in submittedWebformIds) %}
+            *
+          {% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  {{ activeFormRenderArr }}
+</div>

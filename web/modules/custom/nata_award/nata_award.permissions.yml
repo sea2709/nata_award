@@ -1,0 +1,10 @@
+'nominate nata_award':
+  title: Nominate
+'administer nata_award':
+  title: Administer NATA Award
+'view nata_award entity':
+  title: View NATA Award
+'edit nata_award entity':
+  title: Edit NATA Award
+'delete nata_award entity':
+  title: Delete NATA Award

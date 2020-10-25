@@ -1,0 +1,11 @@
+# Define the 'local' links for the module
+
+nata_award.award.settings_tab:
+  route_name: nata_award.award_settings
+  title: Settings
+  base_route: nata_award.award_settings
+
+nata_award.candidate.settings_tab:
+  route_name: nata_award.candidate_settings
+  title: Settings
+  base_route: nata_award.candidate_settings

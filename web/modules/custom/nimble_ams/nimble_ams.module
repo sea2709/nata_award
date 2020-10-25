@@ -1,0 +1,478 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations of the Nimble AMS module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * @param $implementations
+ * @param $hook
+ */
+function nimble_ams_module_implements_alter(&$implementations, $hook) {
+  // make sure this module's user form alter hook runs last
+  if ($hook == 'form_user_form_alter' || $hook == 'page_attachments') {
+    $group = $implementations['nimble_ams'];
+    unset($implementations['nimble_ams']);
+    $implementations['nimble_ams'] = $group;
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Add metatag robots=nofollow
+ *
+ * @param array $page
+ */
+function nimble_ams_page_attachments(array &$page) {
+  $current_path = \Drupal::service('path.current')->getPath();
+  if ($current_path == '/admin/login') {
+    $description = [
+      '#tag'        => 'meta',
+      '#attributes' => [
+        'property' => 'robots',
+        'content'  => 'noindex',
+      ],
+    ];
+    $page['#attached']['html_head'][] = [$description, 'description'];
+  }
+}
+
+/**
+ * Implements hook_form_FORMID_alter().
+ *
+ * Disable the user login form except for
+ *
+ * @param $form
+ * @param $form_state
+ * @param $form_id
+ */
+function nimble_ams_form_user_login_form_alter(&$form, $form_state, $form_id) {
+  $current_path = \Drupal::service('path.current')->getPath();
+  if ($current_path != '/admin/login') {
+    $form['#access'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORMID_alter().
+ *
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param $form_id
+ */
+function nimble_ams_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $current_user = \Drupal::currentUser();
+  $roles = $current_user->getRoles();
+  $config = \Drupal::config('openid_connect.settings.nimble');
+  $settings = $config->get('settings');
+  if (!empty($settings['roles_allowed_user_form']) && empty(array_intersect(array_values($settings['roles_allowed_user_form']), $roles))) {
+    $field_map = \Drupal::service('entity_field.manager')->getFieldMap();
+    $user_fields = ['account', 'language', 'actions', 'contact', 'user_picture', 'timezone'];
+    foreach ($field_map['user'] as $field_name => $field) {
+      if (strpos($field_name, 'field_') === 0) {
+        $user_fields[] = $field_name;
+      }
+    }
+    foreach ($user_fields as $field_name) {
+      $form[$field_name]['#access'] = FALSE;
+    }
+  }
+  $form['nimble_profile_info'] = [
+    '#type' => 'container',
+  ];
+  $host = \Drupal::request()->getSchemeAndHttpHost();
+  $redirect_snippet = '?retUrl=' . $host .'/user';
+  if (!empty($settings['endpoint'])) {
+    $form['nimble_profile_info']['profile'] = [
+      '#type'   => 'markup',
+      '#markup' => '<a href="' . $settings['endpoint'] . '/nc__myprofile' . $redirect_snippet . '">Edit NATA Profile</a>',
+      '#prefix' => '<div class="nimble-profile">',
+      '#suffix' => '</div>',
+    ];
+  }
+}
+
+/**
+ * Implements hook_openid_connect_pre_authorize().
+ *
+ * Should return either an user object or TRUE for allow $account match, or FALSE to deny $account match
+ *
+ * see hook_openid_connect_pre_authorize($account, array $context) in modules/contrib/openid_connect/openid_connect.api.php
+ *
+ * @param $account
+ * @param array $context
+ *
+ * @return \Drupal\user\UserInterface|bool
+ */
+function nimble_ams_openid_connect_pre_authorize($account, array $context) {
+  // For the nimble open id connect plugin
+  if ($context['plugin_id'] == 'nimble') {
+    // if account is empty, that is not already matched
+    if (empty($account)) {
+      $config = \Drupal::config('openid_connect.settings.nimble');
+      $settings = $config->get('settings');
+      $member_num_field = !empty($settings['member_number_field_name']) ? $settings['member_number_field_name'] : 0;
+      $userinfo_member_num = !empty($context['userinfo']['custom_attributes']['NATAId']) ? $context['userinfo']['custom_attributes']['NATAId'] : '';
+      // try to match by member number field
+      if (!empty($member_num_field) && !empty($userinfo_member_num)) {
+        // query for users by member number field
+        $query = \Drupal::entityQuery('user')->condition($member_num_field, $userinfo_member_num);
+        $member_num_query_result = $query->execute();
+        if (!empty($member_num_query_result)) {
+          $member_num_uids = array_keys($member_num_query_result);
+          $member_num_uid = reset($member_num_uids);
+          $user_storage = \Drupal::entityManager()->getStorage('user');
+          // Load a single user
+          if (!empty($member_num_uid)) {
+            $found_account_member_num = $user_storage->load($member_num_uid);
+            if (!empty($found_account_member_num)) {
+              return $found_account_member_num;
+            }
+          }
+        }
+      }
+    }
+  }
+  return TRUE;
+}
+
+/**
+ * Implements hook_openid_connect_userinfo_save().
+ *
+ * @param \UserInterface $account
+ * @param array $context
+ */
+function nimble_ams_openid_connect_userinfo_save($account, array $context) {
+  // For the nimble open id connect plugin
+  if ($context['plugin_id'] == 'nimble') {
+    $config = \Drupal::config('openid_connect.settings.nimble');
+    $settings = $config->get('settings');
+    if (!empty($settings['enable_logging'])) {
+      \Drupal::logger('nimble_ams-SSOUserinfo')->notice('<pre>' . print_r($context['userinfo'], TRUE) . '</pre>');
+    }
+
+    $member_num_field = !empty($settings['member_number_field_name']) ? $settings['member_number_field_name'] : 0;
+    $userinfo_member_num = !empty($context['userinfo']['custom_attributes']['NATAId']) ? $context['userinfo']['custom_attributes']['NATAId'] : '';
+    // set user member num field value from open id connect user info
+    if (!empty($member_num_field) && !empty($userinfo_member_num)) {
+      $account->set($member_num_field, $userinfo_member_num);
+    }
+    // set email from open id connect user info
+    $account->set('mail', $context['userinfo']['email']);
+    $account->set('name', $context['userinfo']['email']);
+
+    // assign automatic roles
+    if (!empty($settings['roles_automatic_roles'])) {
+      foreach ($settings['roles_automatic_roles'] as $role_id) {
+        $account->addRole($role_id);
+      }
+    }
+
+    // account query
+    if (!empty($settings['account_query_enable'])) {
+      if (!empty($context['userinfo']['custom_attributes']['AccountId'])) {
+        nimble_ams_account_query_api_call($settings, $context['userinfo']['custom_attributes']['AccountId'], $userinfo_member_num, $account, $context['userinfo']);
+      }
+    }
+  }
+}
+
+/**
+ * @param $settings
+ *   The open id connect 'settings' portion of it's configuration entity
+ * @param $account_id
+ * @param $member_num
+ * @param $account
+ * @param $userinfo
+ */
+function nimble_ams_account_query_api_call($settings, $account_id, $member_num, $account, $userinfo) {
+  $request_body = new stdClass();
+  $request_body->Request = new stdClass();
+  $request_body->Request->Parameters = new stdClass();
+  if (!empty($settings['endpoint'])) {
+    $request_body->Request->Name = !empty($settings['account_query_name']) ? $settings['account_query_name'] : '';
+    $request_body->Request->AuthenticationKey = !empty($settings['account_query_key']) ? $settings['account_query_key'] : '';
+    $request_body->Request->Parameters->Id_param = $account_id;
+
+    $api_path = !empty($settings['account_query_append_url']) ? $settings['account_query_append_url'] : '';
+    $full_path = $settings['endpoint'] . '/' . $api_path;
+    $response = \Drupal::httpClient()
+      ->post($full_path, [
+        'json'        => $request_body,
+        'http_errors' => FALSE,
+      ]);
+    if ($response->getStatusCode() == 200 && $response->getReasonPhrase() == 'OK') {
+      $response_contents = $response->getBody()->getContents();
+      $response_contents_unpacked = json_decode($response_contents, TRUE);
+      if (!empty($settings['enable_logging'])) {
+        \Drupal::logger('nimble_amsAccountQueryResponseBody')->notice('<pre>' . print_r($response_contents_unpacked, TRUE) . '</pre>');
+      }
+      if (!empty($response_contents_unpacked['RecordCount']) && !empty($response_contents_unpacked['Records'][0]['Id'])) {
+        nimble_ams_update_account_from_account_query_record($response_contents_unpacked['Records'][0], $settings, $account, $userinfo);
+      }
+    }
+    else {
+      // error, log it
+      \Drupal::logger('nimble_amsAccountQueryError-StatusCode')->notice($response->getStatusCode());
+      \Drupal::logger('nimble_amsAccountQueryError-ReasonPhrase')->notice($response->getReasonPhrase());
+      \Drupal::logger('nimble_amsAccountQueryError-ResponseBody')->notice($response->getBody()->getContents());
+    }
+  }
+}
+
+/**
+ * Utility function to update user info from AccountQuery
+ *
+ * @param $record
+ * @param $settings
+ * @param $account
+ * @param $userinfo
+ */
+function nimble_ams_update_account_from_account_query_record($record, $settings, $account, $userinfo) {
+  try {
+    if (!empty($settings['account_id_field_name'])) {
+      $account->set($settings['account_id_field_name'], $record['Id']);
+    }
+
+    // Handle Member / non member roles
+    // make sure account has appropriate member / non member role
+    $user_roles = user_role_names(TRUE);
+    if (isset($user_roles['authenticated'])) {
+      unset($user_roles['authenticated']);
+    }
+    $member_role = !empty($settings['roles_member_role']) ? $settings['roles_member_role'] : '';
+    $non_member_role = !empty($settings['roles_non_member_role']) ? $settings['roles_non_member_role'] : '';
+    if (!empty($record['NATAMember__c']) || !empty($record['IsStaff__c'])) {
+      if (!empty($settings['is_member_field_name'])) {
+        $account->set($settings['is_member_field_name'], $record['NATAMember__c']);
+      }
+      if ($record['NATAMember__c'] == 'Yes' || !empty($record['IsStaff__c'])) {
+        // member
+        if (!empty($member_role)) {
+          $account->addRole($member_role);
+        }
+        if (!empty($non_member_role)) {
+          $account->removeRole($non_member_role);
+        }
+      }
+      else {
+        // non member
+        if (!empty($non_member_role)) {
+          $account->addRole($non_member_role);
+        }
+        if (!empty($member_role)) {
+          $account->removeRole($member_role);
+        }
+      }
+    }
+
+    // membership type
+    if (!empty($settings['membership_type_field_name'])) {
+      $membership_type = !empty($record['NU__MembershipType__c']) ? $record['NU__MembershipType__c'] : '';
+      if (!empty($membership_type)) {
+        // set membership type
+        $account->set($settings['membership_type_field_name'], $membership_type);
+      }
+      else {
+        // doesn't have membership type
+        // if membership type field has value, unset it
+        $account->set($settings['membership_type_field_name'], '');
+      }
+      // Staff
+      if (!empty($record['IsStaff__c'])) {
+        $account->set($settings['membership_type_field_name'], 'Staff');
+      }
+    }
+
+    // membership type id
+    $membership_type_id = !empty($record['NU__Membership__r']['NU__MembershipType2__c']) ? $record['NU__Membership__r']['NU__MembershipType2__c'] : '';
+    if (!empty($membership_type_id)) {
+      // set membership type
+      if (!empty($settings['membership_type_id_field_name'])) {
+        $account->set($settings['membership_type_id_field_name'], $membership_type_id);
+      }
+      // set roles based on membership type id
+      foreach ($user_roles as $rid => $role) {
+        if (!empty($settings['roles_mapped_membership_types'][$rid])) {
+          // set roles based on membership type id
+          if ($membership_type_id == $settings['roles_mapped_membership_types'][$rid]) {
+            $account->addRole($rid);
+          }
+          else {
+            $account->removeRole($rid);
+          }
+        }
+      }
+
+    }
+    else {
+      // doesn't have membership type
+      // if membership type field has value, unset it
+      if (!empty($settings['membership_type_id_field_name'])) {
+        $account->set($settings['membership_type_id_field_name'], '');
+      }
+      // remove all roles managed by membership type
+      // unset roles based on membership type id
+      foreach ($user_roles as $rid => $role) {
+        if (!empty($settings['roles_mapped_membership_types'][$rid])) {
+          $account->removeRole($rid);
+        }
+      }
+    }
+    // Is Member
+    $is_member = !empty($record['NATAMember__c']) ? $record['NATAMember__c'] : 'No';
+    if (!empty($setting['is_member_field_name'])) {
+      $account->set($setting['is_member_field_name'], $is_member);
+    }
+
+    $emptyValues = ['',"", 0, "FALSE", FALSE, "false", "False"];
+    // Is Staff
+    $is_staff = in_array($record['IsStaff__c'], $emptyValues) ? 0 : 1;
+    if (!empty($setting['is_staff_field_name'])) {
+      $account->set($setting['is_staff_field_name'], $is_staff);
+    }
+
+    // Is Student
+    $is_student = in_array($record['IsStudent__c'], $emptyValues) ? 0 : 1;
+    if (!empty($is_student_field)) {
+      $account->set($setting['is_student_field_name'], $is_student);
+    }
+
+    // Membership Join Date
+    if (!empty($settings['membership_join_date_field_name'])) {
+      if (isset($record['NU__JoinOn__c'])) {
+        $account->set($settings['membership_join_date_field_name'], $record['NU__JoinOn__c']);
+      }
+      else {
+        // assuming if there is no value from the Nimble API record, but there is one already on the account object
+        // then the user went from member to non-member, unset the field value
+        $account->set($settings['membership_join_date_field_name'], '');
+      }
+    }
+
+    // Membership Start Date
+    if (!empty($settings['membership_start_date_field_name'])) {
+      if (isset($record['NU__Membership__r']['NU__StartDate__c'])) {
+        $account->set($settings['membership_start_date_field_name'], $record['NU__Membership__r']['NU__StartDate__c']);
+      }
+      else {
+        $account->set($settings['membership_start_date_field_name'], '');
+      }
+    }
+
+    // Membership End Date
+    if (!empty($settings['membership_end_date_field_name'])) {
+      if (isset($record['NU__Membership__r']['NU__EndDate__c'])) {
+        $account->set($settings['membership_end_date_field_name'], $record['NU__Membership__r']['NU__EndDate__c']);
+      }
+      else {
+        $account->set($settings['membership_end_date_field_name'], '');
+      }
+    }
+
+    // Membership End Date Override
+    if (!empty($settings['membership_end_date_override_field_name'])) {
+      if (isset($record['NU__Membership__r']['NU__EndDateOverride__c'])) {
+        $account->set($settings['membership_end_date_override_field_name'], $record['NU__Membership__r']['NU__EndDateOverride__c']);
+      }
+      else {
+        $account->set($settings['membership_end_date_override_field_name'], '');
+      }
+    }
+
+    // District
+    if (!empty($settings['district_field_name'])) {
+      if (isset($record['District__c'])) {
+        $account->set($settings['district_field_name'], $record['District__c']);
+      }
+    }
+
+    // Job Setting
+    if (!empty($settings['job_setting_field_name'])) {
+      if (isset($record['JobSettingPrimaryAffiliation__c'])) {
+        $account->set($settings['job_setting_field_name'], $record['JobSettingPrimaryAffiliation__c']);
+      }
+    }
+
+    // Age
+    if (!empty($settings['age_field_name'])) {
+      if (isset($record['Age__c'])) {
+        $account->set($settings['age_field_name'], $record['Age__c']);
+      }
+    }
+
+    // Gender
+    if (!empty($settings['gender_field_name'])) {
+      if (isset($record['NU__Gender__c'])) {
+        $account->set($settings['gender_field_name'], $record['NU__Gender__c']);
+      }
+    }
+
+    // Full Name
+    if (!empty($settings['full_name_field_name'])) {
+      if (!empty($record['NU__FullName__c'])) {
+        $account->set($settings['full_name_field_name'], $record['NU__FullName__c']);
+      }
+    }
+
+    // name
+    if (!empty($settings['name_field_name'])) {
+      if (isset($record['Name'])) {
+        $account->set($settings['name_field_name'], $record['Name']);
+      }
+    }
+
+    // name
+    if (!empty($settings['title_field_name'])) {
+      if (isset($record['PersonTitle'])) {
+        $account->set($settings['title_field_name'], $record['PersonTitle']);
+      }
+    }
+
+    // first name
+    if (!empty($settings['first_name_field_name'])) {
+      if (isset($record['FirstName'])) {
+        $account->set($settings['first_name_field_name'], $record['FirstName']);
+      }
+    }
+
+    // last name
+    if (!empty($settings['last_name_field_name'])) {
+      if (isset($record['LastName'])) {
+        $account->set($settings['last_name_field_name'], $record['LastName']);
+      }
+    }
+
+    // company
+    if (isset($record['NU__PrimaryAffiliation__r'])) {
+      // Company Nimble Account ID
+      if (!empty($settings['company_account_id_field_name'])) {
+        if (isset($record['NU__PrimaryAffiliation__r']['Id'])) {
+          $account->set($settings['company_account_id_field_name'], $record['NU__PrimaryAffiliation__r']['Id']);
+        }
+      }
+      // Company Name
+      if (!empty($settings['company_name_field_name'])) {
+        if (isset($record['NU__PrimaryAffiliation__r']['Name'])) {
+          $account->set($settings['company_name_field_name'], $record['NU__PrimaryAffiliation__r']['Name']);
+        }
+      }
+    }
+
+    // extra email field
+    if (!empty($settings['extra_email_field_name'])) {
+      if (isset($userinfo['email'])) {
+        $account->set($settings['extra_email_field_name'], $userinfo['email']);
+      }
+    }
+  }
+  catch (Exception $e) {
+    \Drupal::logger('nimble_ams')->notice($e->getMessage());
+  }
+}

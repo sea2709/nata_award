@@ -1,0 +1,474 @@
+html, body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+}
+
+body {
+  background: #FFF;
+}
+
+#header {
+  background: none;
+  border-bottom: 1px solid #0746B0;
+}
+
+.region-header .site-branding__name a {
+  color: #333;
+}
+
+#header .region-header .site-branding {
+  float: none;
+  text-align: center;
+  position: relative;
+  margin-top: 30px;
+}
+
+#header .site-branding__logo {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  margin-bottom: 0;
+}
+
+#header .site-branding__name {
+  font-size: 36px;
+  letter-spacing: -1.5px;
+}
+
+#header .region-secondary-menu {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: right;
+  z-index: 1;
+}
+
+#header .block-nata-award-user-block {
+  text-align: right;
+}
+
+#header .region-secondary-menu a {
+  margin-right: 15px;
+}
+
+.site-branding__text {
+  margin-bottom: 10px;
+}
+
+.featured-top {
+  text-align: left;
+  background: #0746B0;
+  padding: 0;
+  text-shadow: none;
+}
+
+.featured {
+  color: #FFF;
+  display: flex;
+  align-items: center;
+}
+
+.featured .img {
+  line-height: 0;
+  padding: 15px;
+  width: 250px
+}
+
+.featured .info {
+  width: calc(100% - 250px);
+}
+
+.featured h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #FFF;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1;
+}
+
+.featured h2 {
+  font-size: 21px;
+  color: #D1D1D1;
+  margin-top: 5px;
+}
+
+.featured h3 {
+  font-size: 1em;
+  margin: 0;
+}
+
+.award-candidates {
+  text-align: center;
+}
+
+.award-candidates .view-header {
+  color: #E55319;
+  font-size: 1.15em;
+  margin-bottom: 20px;
+}
+
+.award-candidates table {
+  margin-bottom: 0;
+}
+
+/*.region-featured-bottom-first {*/
+/*    background: #EEE;*/
+/*    padding: 30px !important;*/
+/*}*/
+
+.block-views h2 {
+  text-align: center;
+}
+
+.main-content h2 {
+  font-size: 1.75em;
+}
+
+.featured-bottom {
+  border-top: none;
+  background: none;
+}
+
+.featured-bottom .block {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.featured-bottom h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.featured-bottom-second-section {
+  background: #EEE;
+  /*margin-top: 30px;*/
+  padding: 15px 0;
+}
+
+.featured-bottom-second-section .view-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.featured-bottom-second-section .view-content .views-row {
+  background: #FFF;
+  margin: 15px;
+  flex-grow: 1;
+  max-width: 30%;
+  position: relative;
+  padding-bottom: 40px;
+}
+
+.featured-bottom-second-section .view-content .views-row .button {
+  position: absolute;
+  bottom: 15px;
+}
+
+.featured-bottom-second-section .view-content .views-row > div {
+  padding: 15px;
+  line-height: 1.5em;
+}
+
+.featured-bottom-second-section .view-content .views-row .field--name-name {
+  font-size: 1.75em;
+  line-height: 1.25;
+  margin-bottom: 15px;
+  min-height: 70px;
+}
+
+.featured-bottom-second-section .form-item-nomimation-criteria {
+  color: #E55319;
+}
+
+.nata-award-search-candidates-form .layout__region--content {
+  text-align: center;
+  max-width: 800px;
+  margin: auto;
+}
+
+.nata-award-search-candidates-form .layout__region--content .field--name-name {
+  font-size: 2.25em;
+}
+
+.nata-award-search-candidates-form .layout__region--content .form-item-nomimation-criteria {
+  color: #E55319;
+  margin: 10px 0;
+  font-weight: 700;
+}
+
+.search-form-wrapper {
+  max-width: 650px;
+  margin: auto;
+  text-align: center;
+  position: relative;
+  padding: 0 50px;
+}
+
+.search-form-wrapper .form-item label {
+  display: inline;
+}
+
+.search-form-wrapper .form-item input {
+  width: calc(100% - 180px);
+  border-color: #E55319;
+}
+
+.search-form-wrapper .button {
+  position: absolute;
+  right: 20px;
+  top: 68px;
+}
+
+h1.page-title {
+  text-align: center;
+  margin-bottom: 1.5em;
+  color: #0746B0;
+}
+
+.nata-award-nominate-candidates-form .form-actions {
+  text-align: center;
+}
+
+.nata-award-nominate-candidates-form .form-item-statement {
+  margin-bottom: 0;
+}
+
+.nata-award-nominate-candidates-form .form-item-agreement-term {
+  margin: 0;
+  padding: 15px 20px;
+  background: #EEE;
+}
+
+.nata-award-award-candidacy {
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.nata-award-award-candidacy ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.nata-award-award-candidacy .label {
+  font-weight: 400;
+}
+
+.nata-award-award-candidacy .nominee .value, .nata-award-award-candidacy .award .value {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.nata-award-award-candidacy .status .value {
+  font-weight: 700;
+}
+
+.path-candidate .print__link--pdf {
+  background-color: #0746B0;
+  background-image: none;
+  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
+  color: #FFF;
+  padding: 5px 15px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  margin: 0;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.path-candidate .print__wrapper--pdf {
+  text-align: center;
+  margin: 10px 0 20px;
+}
+
+.path-candidate .webform-confirmation__message {
+  text-align: center;
+}
+
+.nata-award-candidate-forms {
+  display: flex;
+  padding: 30px 0;
+  border-top: 1px solid #DDD;
+  border-bottom: 1px solid #DDD;
+  margin-bottom: 30px;
+}
+
+.nata-award-candidate-forms .links {
+  font-size: 1em;
+  border-right: 3px solid #0746B0;
+}
+
+.nata-award-candidate-forms .links li:hover {
+  background: #EEE;
+}
+
+.nata-award-candidate-forms .links li.is-active {
+  font-weight: 700;
+  background: #DDD;
+}
+
+.nata-award-candidate-forms .webform-submission-form, .nata-award-candidate-forms .webform-submission-data {
+  padding-left: 20px;
+  width: 100%;
+}
+
+.nata-award-candidate-forms .webform-submission-form .webform-elements > div:first-child {
+  margin-top: 0;
+}
+
+.nata-award-candidate-forms .links li a {
+  border-bottom: none;
+  color: #3b3b3b;
+  padding: 15px;
+  display: block;
+}
+
+.nata-award-candidate-forms table thead th[colspan="2"] .visually-hidden {
+  position: static !important;
+  width: auto;
+  height: auto;
+  clip: auto;
+}
+
+.nata-award-candidate-forms .webform-multiple-table td {
+  padding: 5px;
+}
+
+.nata-award-candidate-forms .webform-multiple-table td select {
+  padding: 3px 4px;
+  border: 1px solid #CCC;
+  margin-top: 2px;
+}
+
+.nata-award-candidate-forms .webform-multiple-table td .form-date {
+  padding: 3px 4px;
+  border: 1px solid #CCC;
+}
+
+.nata-award-candidate-forms .webform-multiple-table td .form-radios {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.nata-award-candidate-forms .webform-multiple-table td .form-radios .form-type-radio label {
+  margin-left: 0;
+}
+
+.nata-award-candidate-forms .form-item .description {
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.path-candidate .invite-actions-wrapper {
+  text-align: center;
+}
+
+.path-candidate .invitation-list {
+  margin-bottom: 30px;
+}
+
+.path-candidate .button-wrapper {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.path-candidate .button-wrapper .button {
+  margin: 0 15px;
+}
+
+.path-candidate .submit-btn-wrapper {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.nata-candidate-invitation {
+  max-width: 800px;
+  margin: auto;
+}
+
+.nata-candidate-invitation .form-submit {
+  margin-left: 15px;
+}
+
+.nata-candidate-invitation .user-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: -1em;
+  margin-right: -1em;
+}
+
+.nata-candidate-invitation .user-wrapper .form-item {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.nata-candidate-invitation .user-wrapper input {
+  width: 100%;
+}
+
+.status-value {
+  font-weight: 700;
+  display: inline-block;
+}
+
+.status-value:first-letter {
+  text-transform: uppercase;
+}
+
+.status-accepted, .status-Accepted {
+    color: #0746B0;
+}
+
+.status-submitted, .status-Submitted {
+  color: #961199;
+}
+
+.status-nominated, .status-invited,
+.status-Nominated, .status-Invited {
+  color: #07A68A;
+}
+
+.status-declined, .status-Declined {
+  color: #616161
+}
+
+.page-403 {
+  text-align: center;
+}
+
+.block-views-blockmy-nominations-block-1, .block-views-blockcandidates-i-am-sponsoring-block-1 {
+  padding: 30px !important;
+  flex-grow: 1;
+}
+
+.form-item select {
+  border: 1px solid #CCC;
+}
+
+.webform-details-toggle-state-wrapper {
+  display: none;
+}
+
+.region-featured-bottom-first {
+  display: flex;
+}
+
+.webform-options-display-side-by-side > div {
+  margin-right: 1em;
+}
+
+@media (min-width: 560px) {
+  .featured-bottom .region {
+    float: none;
+    width: 100%;
+  }
+}
